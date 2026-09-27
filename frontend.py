@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image
@@ -47,7 +48,6 @@ if uploaded_file is not None:
         temp_path = None
 
         try:
-            # Save uploaded image temporarily
             with tempfile.NamedTemporaryFile(
                 delete=False,
                 suffix=".jpg"
@@ -68,7 +68,7 @@ if uploaded_file is not None:
             # Annotated image
             annotated_image = result.plot()
 
-            # BGR → RGB
+            # Convert BGR to RGB
             annotated_pil = Image.fromarray(
                 annotated_image[:, :, ::-1]
             )
@@ -77,78 +77,15 @@ if uploaded_file is not None:
             if temp_path and os.path.exists(temp_path):
                 os.unlink(temp_path)
 
-    # Detection results
+    # Detection result
     with col2:
-        st.subheader("Detection Results")
-
+        st.subheader("Detection Result")
         st.image(
             annotated_pil,
             use_container_width=True
         )
 
-    # Statistics
-    detections = result.boxes
-
-    st.subheader("Detection Statistics")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            "Total Detections",
-            len(detections)
-        )
-
-    with col2:
-        if len(detections) > 0:
-            avg_conf = detections.conf.mean().item()
-
-            st.metric(
-                "Avg Confidence",
-                f"{avg_conf:.2%}"
-            )
-        else:
-            st.metric(
-                "Avg Confidence",
-                "N/A"
-            )
-
-    with col3:
-        if len(detections) > 0:
-            max_conf = detections.conf.max().item()
-
-            st.metric(
-                "Max Confidence",
-                f"{max_conf:.2%}"
-            )
-        else:
-            st.metric(
-                "Max Confidence",
-                "N/A"
-            )
-
-    # Detailed detections
-    if len(detections) > 0:
-
-        st.subheader("Detailed Detections")
-
-        det_data = []
-
-        for i, box in enumerate(detections):
-
-            det_data.append({
-                "Acne #": i + 1,
-                "Confidence": f"{box.conf.item():.2%}",
-                "X1": int(box.xyxy[0][0].item()),
-                "Y1": int(box.xyxy[0][1].item()),
-                "X2": int(box.xyxy[0][2].item()),
-                "Y2": int(box.xyxy[0][3].item())
-            })
-
-        st.dataframe(
-            det_data,
-            use_container_width=True
-        )
-
-    else:
+    # No detection message
+    if len(result.boxes) == 0:
         st.info("No acne detected.")
+```
