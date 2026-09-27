@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image
@@ -21,17 +22,6 @@ def load_model():
 
 model = load_model()
 
-# Sidebar
-st.sidebar.header("Settings")
-
-conf_threshold = st.sidebar.slider(
-    "Confidence Threshold",
-    0.0,
-    1.0,
-    0.25,
-    0.05
-)
-
 # Upload image
 uploaded_file = st.file_uploader(
     "Upload skin image",
@@ -47,7 +37,10 @@ if uploaded_file is not None:
     # Original image
     with col1:
         st.subheader("Original Image")
-        st.image(image, use_container_width=True)
+        st.image(
+            image,
+            use_container_width=True
+        )
 
     # Detection
     with st.spinner("Detecting acne..."):
@@ -55,7 +48,7 @@ if uploaded_file is not None:
         temp_path = None
 
         try:
-            # Create temporary image
+            # Save uploaded image temporarily
             with tempfile.NamedTemporaryFile(
                 delete=False,
                 suffix=".jpg"
@@ -64,10 +57,10 @@ if uploaded_file is not None:
                 image.save(tmp.name)
                 temp_path = tmp.name
 
-            # Prediction
+            # Fixed confidence threshold
             results = model.predict(
                 temp_path,
-                conf=conf_threshold,
+                conf=0.25,
                 imgsz=640
             )
 
@@ -82,19 +75,19 @@ if uploaded_file is not None:
             )
 
         finally:
-            # Remove temporary file
             if temp_path and os.path.exists(temp_path):
                 os.unlink(temp_path)
 
-    # Results
+    # Detection results
     with col2:
         st.subheader("Detection Results")
+
         st.image(
             annotated_pil,
             use_container_width=True
         )
 
-    # Detection statistics
+    # Statistics
     detections = result.boxes
 
     st.subheader("Detection Statistics")
@@ -159,6 +152,5 @@ if uploaded_file is not None:
         )
 
     else:
-        st.info(
-            "No acne detected. Try lowering the confidence threshold."
-        )
+        st.info("No acne detected.")
+```
