@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image
@@ -88,4 +87,3 @@ if uploaded_file is not None:
     # No detection message
     if len(result.boxes) == 0:
         st.info("No acne detected.")
-```
