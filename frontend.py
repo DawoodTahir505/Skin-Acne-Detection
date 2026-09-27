@@ -152,4 +152,3 @@ if uploaded_file is not None:
 
     else:
         st.info("No acne detected.")
-```
